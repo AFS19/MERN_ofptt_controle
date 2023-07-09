@@ -1,0 +1,21 @@
+{
+    "name": "01_afssas_mohamed",
+    "version": "1.0.0",
+    "description": "nodejs api controle avec mr sqalli",
+    "main": "app.js",
+    "scripts": {
+        "dev": "nodemon app.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bootstrap": "^5.3.0",
+        "dotenv": "^16.0.3",
+        "ejs": "^3.1.9",
+        "express": "^4.18.2",
+        "mongoose": "^7.1.1"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.22"
+    }
+}

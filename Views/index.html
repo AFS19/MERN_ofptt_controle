@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Employee Management System</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body style="background-color: aquamarine">
+    <div class="w-75 m-auto pt-0 pr-4 pb-4 pl-4 bg-white">
+      <h1 class="mt-4 mb-5 text-center text-info">
+        Employee Management System
+      </h1>
+
+      <div class="row">
+        <!-- Afficher tots les employes -->
+        <div class="mt-4 col-md-6">
+          <h2>Afficher tots les employes</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Poste</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="data-container"></tbody>
+          </table>
+        </div>
+
+        <!-- Ajouter une employe -->
+        <div class="mt-4 col-md-6">
+          <h2>Ajouter une employe</h2>
+          <form id="add-form">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="id-input"
+                placeholder="ID"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="name-input"
+                placeholder="Nom"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="position-input"
+                placeholder="Poste"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="row mt-5">
+        <!-- Mettre à jour employe -->
+        <div class="mt-4 col-md-6">
+          <h2>Mettre à jour employe</h2>
+          <form id="update-form">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="update-id-input"
+                placeholder="ID"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="update-name-input"
+                placeholder="Nom"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="update-position-input"
+                placeholder="Poste"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+          </form>
+        </div>
+
+        <!-- Afficher les employes avec limit -->
+        <div class="mt-4 col-md-6">
+          <h2>Afficher les employes avec limit</h2>
+          <form id="limit-form">
+            <div class="form-group">
+              <input
+                type="number"
+                class="form-control"
+                id="limit-input"
+                placeholder="Limite"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Limiter</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Afficher tots les employes
+        $.ajax({
+          url: "http://127.0.0.1:4225/employes",
+          method: "GET",
+          success: function (data) {
+            var tbody = $("#data-container");
+            tbody.empty();
+            data.forEach(function (employee) {
+              var row = `<tr>
+                        <td>${employee._id}</td>
+                        <td>${employee.Nom_employe}</td>
+                        <td>${employee.Poste}</td>
+                        <td>
+                          <button class="btn btn-primary update-btn" data-id="${employee._id}" data-name="${employee.Nom_employe}" data-position="${employee.Poste}">Mettre à jour</button>
+                          <button class="btn btn-danger delete-btn" data-id="${employee._id}">Supprimer</button>
+                        </td>
+                      </tr>`;
+              tbody.append(row);
+            });
+          },
+        });
+
+        // Ajouter une employe
+        $("#add-form").submit(function (event) {
+          event.preventDefault();
+          var id = $("#id-input").val();
+          var name = $("#name-input").val();
+          var position = $("#position-input").val();
+
+          $.ajax({
+            url: "http://127.0.0.1:4225/employes/ajouter",
+            method: "POST",
+            data: { _id: id, Nom_employe: name, Poste: position },
+            success: function (response) {
+              alert("Données ajoutées avec succès");
+              location.reload();
+            },
+          });
+        });
+
+        // Mettre à jour employe
+        $(document).on("click", ".update-btn", function () {
+          var id = $(this).data("id");
+          var name = $(this).data("name");
+          var position = $(this).data("position");
+          $("#update-id-input").val(id);
+          $("#update-name-input").val(name);
+          $("#update-position-input").val(position);
+        });
+
+        $("#update-form").submit(function (event) {
+          event.preventDefault();
+          var id = $("#update-id-input").val();
+          var name = $("#update-name-input").val();
+          var position = $("#update-position-input").val();
+
+          $.ajax({
+            url: "http://127.0.0.1:4225/employes/modifier/" + id,
+            method: "PUT",
+            data: { _id: id, Nom_employe: name, Poste: position },
+            success: function (response) {
+              alert("Données mises à jour avec succès");
+              location.reload();
+            },
+          });
+        });
+
+        // Supprimer un employe
+        $(document).on("click", ".delete-btn", function () {
+          var id = $(this).data("id");
+
+          if (confirm("Êtes-vous sûr de vouloir supprimer ces données ?")) {
+            $.ajax({
+              url: "http://127.0.0.1:4225/employes/supprimer/" + id,
+              method: "DELETE",
+              success: function (response) {
+                alert("Données supprimées avec succès");
+                location.reload();
+              },
+            });
+          }
+        });
+
+        // Afficher les employes avec limit
+        $("#limit-form").submit(function (event) {
+          event.preventDefault();
+          var limit = $("#limit-input").val();
+
+          $.ajax({
+            url: "http://127.0.0.1:4225/employes/limit",
+            method: "GET",
+            data: { limit: limit },
+            success: function (data) {
+              var tbody = $("#data-container");
+              tbody.empty();
+              data.forEach(function (employee) {
+                var row = `<tr>
+                          <td>${employee._id}</td>
+                          <td>${employee.Nom_employe}</td>
+                          <td>${employee.Poste}</td>
+                          <td>
+                            <button class="btn btn-primary update-btn" data-id="${employee._id}" data-name="${employee.Nom_employe}" data-position="${employee.Poste}">Mettre à jour</button>
+                            <button class="btn btn-danger delete-btn" data-id="${employee._id}">Supprimer</button>
+                          </td>
+                        </tr>`;
+                tbody.append(row);
+              });
+            },
+          });
+        });
+      });
+    </script>
+    <footer class="mt-5 text-center">
+      <p>
+        &copy; 2023 <span class="h5">Mohamed AFSSAS</span>. All rights reserved.
+      </p>
+    </footer>
+  </body>
+</html>
